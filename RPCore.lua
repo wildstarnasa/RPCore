@@ -1,12 +1,12 @@
+local RPCore = {}
+
 -- RCMP - RPCore Connection and Messaging Protocol
 -- (yes, it's redundant, but I get to reference the Mounties)
+-------------------------------------------------------------
+--	RCMP
+-------------------------------------------------------------
 
-local RPCore = {}
 local RCMPMessage = {}
-
-------------------------------------------------------------------
--- RCMP
-------------------------------------------------------------------
 
 RCMPMessage.Type_Request = 1
 RCMPMessage.Type_Reply = 2 
@@ -173,13 +173,10 @@ function RCMPMessage:ToString()
     return result
 end
 
-function RCMPMessage:Initialize()
-	Apollo.RegisterPackage(RCMPMessage, "RCMPMessage", 1, {})
-end
+-------------------------------------------------------------
+--	RPCore
+-------------------------------------------------------------
 
-------------------------------------------------------------------
--- RP Core
-------------------------------------------------------------------
 RPCore.RCMPMessage = RCMPMessage
 RPCore.Error_UnimplementedProtocol = 1
 RPCore.Error_UnimplementedCommand = 2
@@ -208,6 +205,10 @@ RPCore.Trait_RPState = "rpstate"
 RPCore.Trait_Description = "shortdesc"
 RPCore.Trait_Biography = "bio"
 
+function RPCore:Initialize()
+	Apollo.RegisterPackage(self,"RPCore",1,{});
+end
+
 function RPCore:Reply(mMessage, tPayload)
 	
     local newPacket = RPCore.RCMPMessage:new()
@@ -220,10 +221,6 @@ function RPCore:Reply(mMessage, tPayload)
 	newPacket.command = mMessage:GetCommand()
     newPacket.origin = RPCore:GetOriginName()
     return newPacket
-end
-
-function RPCore:Initialize()
-	Apollo.RegisterPackage(RPCore, "RPCore", 1, {"RCMPMessage"})
 end
 
 function RPCore:OnLoad()
@@ -312,6 +309,7 @@ function RPCore:OnRestore(eLevel, tData)
 		self:LoadFromTable(tData)
 	end
 end
+
 
 function RPCore:RCMPInitialize()
 	if (GameLib.GetPlayerUnit() == nil) then 
@@ -559,6 +557,7 @@ function RPCore:QueryVersion(strTarget)
 	
 	return tVersionInfo.version, tVersionInfo.addons
 end
+
 
 function RPCore:StoreVersion(strTarget, strVersion, aProtocols)
 	if (strTarget == nil or strVersion == nil) then return end 
@@ -864,5 +863,5 @@ function RPCore:RegisterAddonProtocolHandler(strAddonProtocol,fHandler)
 	self.tApiProtocolHandlers[strAddonProtocol] = aHandlers
 end 
 
-RCMPMessage:Initialize()
 RPCore:Initialize()
+RPCore:OnLoad()
