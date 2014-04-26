@@ -1,4 +1,9 @@
-local RPCore = {}
+local MAJOR, MINOR = "RPCore", 1
+local APkg = Apollo.GetPackage(MAJOR)
+if APkg and (APkg.nVersion or 0) >= MINOR then
+	return -- no upgrade is needed
+end
+local RPCore = APkg and APkg.tPackage or {}
 
 -- RCMP - RPCore Connection and Messaging Protocol
 -- (yes, it's redundant, but I get to reference the Mounties)
@@ -206,7 +211,7 @@ RPCore.Trait_Description = "shortdesc"
 RPCore.Trait_Biography = "bio"
 
 function RPCore:Initialize()
-	Apollo.RegisterPackage(self,"RPCore",1,{});
+	Apollo.RegisterPackage(self,MAJOR,MINOR,{});
 end
 
 function RPCore:Reply(mMessage, tPayload)
@@ -693,7 +698,7 @@ function RPCore:ProcessMessage(packet)
 	end
 end
 
-function RPCore:SendMessage(mMessage, fCallback)
+function RPCore:SendMessage(mMessage, fHandler)
     if (mMessage.destination == self:GetOriginName()) then
         -- This is meant for me, I'm not going to send it.  You
         -- can't make me.
@@ -864,4 +869,3 @@ function RPCore:RegisterAddonProtocolHandler(strAddonProtocol,fHandler)
 end 
 
 RPCore:Initialize()
-RPCore:OnLoad()
